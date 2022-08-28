@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+print('hello world')
+
 def plot_multiple():
     '''
     Draws three plots on the same figure by calling
