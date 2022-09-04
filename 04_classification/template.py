@@ -4,6 +4,8 @@
 # Acknowledgements: 
 #
 
+# 1.1 split_Data is not excatcly the same.
+# Independent part, Posterior method should be better, takes in more data...
 
 from tools import load_iris, split_train_test
 
