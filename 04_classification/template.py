@@ -12,6 +12,7 @@ from tools import load_iris, split_train_test
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import multivariate_normal
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 
 def mean_of_class(
@@ -117,6 +118,21 @@ def predict(likelihoods: np.ndarray):
     # highest value in likelihoods is the best prediction
     return np.argmax(likelihoods, axis=1)
 
+def count_targ(train_targets: np.ndarray):
+    counter0 = 0
+    counter1 = 0
+    counter2 = 0
+
+    for value in train_targets:
+        if value == 0:
+            counter0 += 1
+        if value == 1:
+            counter1 += 1
+        if value == 2:
+            counter2 += 1
+    counts_tar = [counter0, counter1, counter2]
+
+    return counts_tar
 
 def maximum_aposteriori(
     train_features: np.ndarray,
@@ -133,7 +149,47 @@ def maximum_aposteriori(
     a [test_features.shape[0] x len(classes)] shaped numpy
     array
     '''
-    ...
+    means, covs = [], []
+    likelihoods = []
+    prob = []
+
+    for class_label in classes:
+        # means and covs are 3x4
+        means.append(mean_of_class(train_features, train_targets, classes[class_label]))
+        covs.append(covar_of_class(train_features, train_targets, classes[class_label]))
+    
+    counts_class = count_targ(train_targets)
+
+    for k in range(len(counts_class)):
+        prior_prob = counts_class[k]/len(train_features) 
+        prob.append(prior_prob)
+    
+    for i in range(test_features.shape[0]):
+        vektor = []
+        for j in range(len(classes)):
+            vektor.append((likelihood_of_class(test_features[i,:], means[j], covs[j]))*prob[j])
+        likelihoods.append(vektor)
+
+    return np.array(likelihoods)
+
+def predict_aposteriori(maximum_aposteriori: np.ndarray):
+    # highest value in likelihoods is the best prediction
+    return np.argmax(maximum_aposteriori, axis=1)
+
+def accuracy(likelihood_targets: np.ndarray, test_targets: np.ndarray):
+    counter = 0
+    for i in range(len(test_targets)):
+        if likelihood_targets[i] == test_targets[i]:
+            counter += 1
+    acc = counter/len(test_targets)
+    return acc
+
+def confusion_mat(method_targets: np.ndarray, test_targets: np.ndarray):
+    # Returns confusion matrix on the train_targets
+    # confusion_matrix(true, predicted)
+    # true left side down, predicted above the matrix
+    return confusion_matrix(test_targets, method_targets)
+
 if __name__ == '__main__':
     # PART 1.1
     # Load the data
@@ -153,10 +209,45 @@ if __name__ == '__main__':
     # print(likelihood_of_class(test_features[0, :], class_mean, class_cov))
 
     # PART 1.4
+    # -----Likelihood classification based on probability ----
     # print(maximum_likelihood(train_features, train_targets, test_features, classes))
 
     # PART 1.5
+    # ---- Predict classification based on probability ----
     likelihoods = maximum_likelihood(train_features, train_targets, test_features, classes)
-    print(likelihoods)
-    # ------- QUESTION ---- if likelihood = 0 ???
     print(predict(likelihoods))
+    
+    # PART 2.1
+    # ---- likelihoods with maximum aposteriori classification ---
+    # print(maximum_aposteriori(train_features, train_targets, test_features, classes))
+
+    # PART 2.2
+    # ---- Predict with maximum aposteriori classification ---
+    likelihoods_aposteriori = maximum_aposteriori(train_features, train_targets, test_features, classes)
+    print(predict_aposteriori(likelihoods_aposteriori))
+
+    # Accuracy of both methods
+    likelihood_targets = predict(likelihoods)
+    aposteriori_targets = predict_aposteriori(likelihoods_aposteriori)
+    print(f"The accuracy for likelihood probability: {accuracy(likelihood_targets, test_targets)}")
+    print(f"The accuracy for likelihood with Aposteriori method: {accuracy(aposteriori_targets, test_targets)}")
+
+    # confusion matrixes
+    print("Confusion matrix for likelihood method:")
+    print(confusion_mat(likelihood_targets, test_targets))
+    print("Confusion matrix for likelihood Aposteriori:")
+    print(confusion_mat(aposteriori_targets, test_targets))
+
+    # ---- Plot confusion matrixes ----
+    cm_likelihood = confusion_mat(likelihood_targets, test_targets)
+    cm_dp_likelihood = ConfusionMatrixDisplay(cm_likelihood).plot()
+    plt.title("Confusion Matrix for likelihood method")
+    plt.show()
+
+    cm_aposteriori = confusion_mat(aposteriori_targets, test_targets)
+    cm_dp_ap = ConfusionMatrixDisplay(cm_aposteriori).plot()
+    plt.title("Confusion Matrix for Aposteriori method")
+    plt.show()
+
+
+
