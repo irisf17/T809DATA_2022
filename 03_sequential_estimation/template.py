@@ -1,5 +1,5 @@
 # Author: Íris Friðriksdóttir
-# Date:
+# Date: 9.september 2022
 # Project: 03_sequential_estimation
 # Acknowledgements: Kristján Daðason
 #
@@ -33,8 +33,34 @@ def update_sequence_mean(
 ) -> np.ndarray:
     '''Performs the mean sequence estimation update
     '''
-    update_mean = mu + 1/ n * (x - mu)
+    # update_mean = mu + 1/ n * (x - mu)
+    update_mean = mu + 1/n  * (x - mu)
     return update_mean
+
+def update_sequence_mean_indepe(
+    mu: np.ndarray,
+    x: np.ndarray,
+    n: int
+) -> np.ndarray:
+    '''Performs the mean sequence estimation update with forget
+    '''
+    # update_mean = mu + 1/ n * (x - mu)
+
+    if n >= 50 and n < 100:
+        return mu + 1/(n-(n*0.5)) * (x - mu)
+    if n >= 100 and n < 200:
+        return mu + 1/(n) * (x - mu)
+    if n >= 200 and n <300:
+        return mu + 1/(n-(n*0.8)) * (x - mu)    
+    if n >= 300 and n <400:
+        return mu + 1/(n-(n*0.8)) * (x - mu)
+    if n >= 400 and n < 450:
+        return mu + 1/(n-(n*0.8)) * (x - mu)
+    if n >= 450:
+        return mu + 1/(n-(n*0.8)) * (x - mu)
+    update_mean = mu + 1/n  * (x - mu)
+    return update_mean
+
 
 def _plot_sequence_estimate(mu: np.ndarray):
     # data = gen_data(100, 3, np.array([0, 0, 0]), np.sqrt(3))
@@ -81,7 +107,7 @@ def _plot_mean_square_error():
     plt.title("Square Error")
     plt.show()
 
-# Naive solution to the independent question.
+# independent question.
 def gen_changing_data(
     n: int,
     k: int,
@@ -91,7 +117,6 @@ def gen_changing_data(
 ) -> np.ndarray:
     # 500 ticks, mean updates slowly with 500 ticks
     mean_estimate = [np.array([0, 0, 0])]
-    forget = [0,0,0]
     # generating data for mean from [0, 1, -1] -> [1, -1, 0] from 0 -500
     mean_updating = np.linspace(start_mean, end_mean, n)
     final_data = []
@@ -100,20 +125,14 @@ def gen_changing_data(
         final_data.append(updated_vec[i])
 
     for j in range(len(final_data)):
-        new_estimate = update_sequence_mean(mean_estimate[-1],final_data[j], j+1)
-        # if j == 200:
-        #     new_estimate = forget
-        # if j == 250:
-        #     new_estimate = forget
-        if j == 250:
-            new_estimate = forget
-        # if j == 400:
-        #     new_estimate = forget
+        new_estimate = update_sequence_mean_indepe(mean_estimate[-1],final_data[j], j+1)
         mean_estimate.append(new_estimate)
   
     updated_estimates = mean_estimate[1::]
+    return mean_updating, updated_estimates
 
-    # return print(list(zip(*updated_estimates))[0])
+def _plot_changing_sequence_estimate(mean_updating, updated_estimates):
+
     x_axis = range(0, len(updated_estimates))
 
     plt.plot(x_axis, list(zip(*updated_estimates))[0], label='First dimension')
@@ -124,9 +143,6 @@ def gen_changing_data(
     plt.legend(loc='upper center')
     plt.show()
   
-    ## _square_error(y, y_hat):
-    # y_hat 303*3 matrix
-    # y = 1*3 list
     sqr_error = []
     for i in range(len(updated_estimates)):
         foo = mean_updating[i] - updated_estimates[i]
@@ -134,18 +150,13 @@ def gen_changing_data(
         mu = np.mean(error)
         sqr_error.append(mu)
 
-    ### _plot_mean_square_error()
     x_axiz = range(0,len(sqr_error))
     plt.plot(x_axiz, sqr_error)
     plt.xlabel("Iterations")
     plt.ylabel("Mean Square Error")
     plt.title("Square Error")
     plt.show()
-    return print(len(updated_estimates))
-
-
-# def _plot_changing_sequence_estimate():
-#     # remove this if you don't go for the independent section
+    return print(f"total sum of sqr error: {sum(sqr_error)}")
 
 
 if __name__ == '__main__':
@@ -183,7 +194,8 @@ if __name__ == '__main__':
     # _plot_mean_square_error()
 
     # # INDEPENDENT PART
-    gen_changing_data(500, 3, np.array([0,1,-1]), np.array([1,-1,0]), np.sqrt(3))
+    # mean_updated, estimates_updated = gen_changing_data(500, 3, np.array([0,1,-1]), np.array([1,-1,0]), np.sqrt(3))
+    # _plot_changing_sequence_estimate(mean_updated, estimates_updated)
 
 
     
