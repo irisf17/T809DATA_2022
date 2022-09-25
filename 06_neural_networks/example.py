@@ -4,6 +4,12 @@ from torch.utils.data import DataLoader, Dataset
 import matplotlib.pyplot as plt
 from tools import load_iris
 
+# dont have to turn any code in Canvas.
+# watch youtube for pytorch, do the turotial,
+# CAPTION EVERY FIGURE IN PDF, text has to refer the figure, 
+# talk about 3 interesting things from figure
+
+# using pytorch for section 2. 
 
 class SimpleNetwork(nn.Module):
     def __init__(self):
@@ -111,7 +117,8 @@ def train_simple_model():
             # for sample i.
             out = model(feature)
             # Calculate the loss for the current batch
-            loss = loss_metric(out, target)
+            # WRONG------ loss = loss_metric(out, target)
+            loss = loss_metric(out, target.type(torch.LongTensor))
             # To perform the backward propagation we do:
             loss.backward()
             # The optimizer then tunes the weights of the model
