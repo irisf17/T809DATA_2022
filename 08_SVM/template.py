@@ -233,31 +233,31 @@ def compare_INDE():
     _subplot_svm_margin(clf, X, t, 5, 1)
     plt.title("C = 0.01, gamma=2")
 
-    clf = svm.SVC(C=50, kernel= 'rbf', gamma=1)
+    clf = svm.SVC(C=0.1, kernel= 'rbf', gamma=1)
     clf.fit(X,t)
     _subplot_svm_margin(clf, X, t, 5, 2)
-    plt.title("C = 500, gamma=1")
+    plt.title("C = 0.1, gamma=1")
 
-    clf= svm.SVC(C=10, kernel= 'rbf', gamma=0.5)
+    clf= svm.SVC(C=0.5, kernel= 'rbf', gamma=0.5)
     clf.fit(X,t)
     _subplot_svm_margin(clf, X, t, 5, 3)
-    plt.title("C = 10, gamma=0.5")
+    plt.title("C = 0.5, gamma=0.5")
 
-    clf= svm.SVC(C=0.05, kernel= 'rbf', gamma=0.5)
+    clf= svm.SVC(C=10, kernel= 'rbf', gamma=0.1)
     clf.fit(X,t)
     _subplot_svm_margin(clf, X, t, 5, 4)
-    plt.title("C = 0.05, gamma=0.5")
+    plt.title("C = 10, gamma=0.1")
 
-    clf= svm.SVC(C=0.0001, kernel= 'rbf', gamma=0.02)
+    clf= svm.SVC(C=1000, kernel= 'rbf', gamma=0.02)
     clf.fit(X,t)
     _subplot_svm_margin(clf, X, t, 5, 5)
-    plt.title("C = 0.0001, gamma=0.02")    
+    plt.title("C = 1000, gamma=0.02")    
 
     plt.show()
 
 if __name__ == '__main__':
     # Part 1.1
-
+    '''
     _plot_linear_kernel()
 
     # Part 1.3
@@ -287,7 +287,7 @@ if __name__ == '__main__':
     print("polynomial")
     svc = svm.SVC(C=1000, kernel='poly')
     train_test_SVM(svc, X_train, t_train, X_test, t_test)
-    '''
+
     # Indepentend Section
     # Comparing visually different parameters on the cancer dataset
     # Hyper-parameters like C or Gamma control how 
@@ -304,7 +304,7 @@ if __name__ == '__main__':
 
 
     # Using larger blob to compare
-    # compare_INDE()
+    compare_INDE()
 
 
 
