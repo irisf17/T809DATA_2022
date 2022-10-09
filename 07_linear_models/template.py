@@ -8,6 +8,7 @@
 # automatically.  We ONLY want the functions as stated in the README.md.
 # Make sure to comment out or remove all unnecessary code before submitting.
 
+from functools import total_ordering
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -130,9 +131,40 @@ def _square_error(real, pred):
         sqr_error.append(error)
     return sqr_error
 
+def best_parameters():
+    lowest_error = 1000
+    sigma = np.linspace(1,100,100)
+    lamda = np.linspace(0, 1/10, 250)
+    best_sigma = 0
+    best_lamda = 0
+
+
+    X,t = load_regression_iris()
+    N,D = X.shape
+    M = 10
+    mu = np.zeros((M, D))
+    for i in range(D):
+        mmin = np.min(X[i, :])
+        mmax = np.max(X[i, :])
+        mu[:, i] = np.linspace(mmin, mmax, M)
+
+    for i in range(len(sigma)):
+        for j in range(len(lamda)):
+            fi = mvn_basis(X, mu, sigma[i])
+            wml = max_likelihood_linreg(fi, t, lamda[j])  
+            prediction = linear_model(X, mu, sigma[i], wml)
+            sqr_error = _square_error(t, prediction)
+            total_sqr = np.sum(sqr_error)
+            if total_sqr < lowest_error:
+                lowest_error = total_sqr
+                best_sigma = sigma[i]
+                best_lamda = lamda[j]
+    return lowest_error, best_sigma, best_lamda
+
+
 if __name__ == '__main__':
     #  PART 1.1
-
+    '''
     X,t = load_regression_iris()
     N,D = X.shape
     M, sigma = 10, 10
@@ -169,6 +201,7 @@ if __name__ == '__main__':
 
     # need to find the square error and plot it to show if getting closer to real value
     sqr_error = _square_error(t, prediction)
+    print(f"sum of total sqr error is: {np.sum(sqr_error)}")
 
     sqr_e_1 = np.sum(sqr_error[0:49])/len(sqr_error[0:49])
     sqr_e_2 = np.sum(sqr_error[50:99])/len(sqr_error[50:99])
@@ -181,8 +214,17 @@ if __name__ == '__main__':
     plt.title("Mean-sqr-Error")
     plt.xlabel("Iterations")
     plt.ylabel("Sqr Error")
-    # plt.text(10, .050, r'$\mu=0.24\ $')
-    plt.text(10, 0.5, r'$\mu=0.24\ $')
-    plt.text(60, 1.2, r'$\mu=0.36\ $')
-    plt.text(115, .050, r'$\mu=2.08\ $')
+
+    plt.text(10, 0.5, r'$\mu=0.03\ $')
+    plt.text(60, 0.5, r'$\mu=0.07\ $')
+    plt.text(115, 0.5, r'$\mu=0.08\ $')
     plt.show()
+    '''
+    '''
+    # INDEPENDENT
+    total_sqr, best_sigma, best_lamda = best_parameters()
+
+    print(total_sqr)
+    print(best_sigma)
+    print(best_lamda)
+    '''
