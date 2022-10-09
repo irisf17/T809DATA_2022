@@ -1,6 +1,6 @@
-# Author: 
-# Date:
-# Project: 
+# Author: Íris Friðriksdóttir
+# Date: 9. oktober 2022
+# Project: 08_SVM
 # Acknowledgements: 
 #
 
