@@ -144,7 +144,7 @@ def _compare_C():
     clf.fit(X,t)
     print(len(clf.support_vectors_))
     _subplot_svm_margin(clf, X, t, 5, 2)
-    plt.title("C = 0.2")
+    plt.title("C = 0.5")
 
     clf= svm.SVC(C=0.3, kernel= 'linear')
     clf.fit(X,t)
@@ -187,71 +187,44 @@ def train_test_SVM(
     acc = accuracy_score(t_test, predicted)
     prec = precision_score(t_test, predicted)
     rec = recall_score(t_test, predicted)
+    mean = acc+prec+rec / 3
 
     print(f"Accuracy score: {acc}")
     print(f"Precision score: {prec}")
     print(f"Recall score: {rec}")
+    print(f"MEAN: {mean}")
     return acc, prec, rec
 
-def comparevirkarekki(
-    svc,
-    X_train: np.ndarray,
-    t_train: np.ndarray,
-    X_test: np.ndarray,
-    t_test: np.ndarray,
-    title: str
-):
-    '''
-    Train a configured SVM on <X_train> and <t_train>
-    and then measure accuracy, precision and recall on
-    the test set
-
-    This function should return (accuracy, precision, recall)
-    '''
-    svc.fit(X_test, t_test)
-    predicted = svc.predict(X_test)
-
-    acc = accuracy_score(t_test, predicted)
-    prec = precision_score(t_test, predicted)
-    rec = recall_score(t_test, predicted)
-
-    plt.plot(range(0,len(t_test)),t_test)
-    plt.plot(range(0,len(predicted)),predicted)
-    plt.title(title)
-    plt.show()
-
-    print(f"Accuracy score: {acc}")
-    print(f"Precision score: {prec}")
-    print(f"Recall score: {rec}")
-    return acc, prec, rec
 
 def compare_INDE():
     plt.figure()
     X,t = make_blobs(n_samples=100, centers=2, random_state=6)
-    clf = svm.SVC(C=0.01, kernel= 'rbf', gamma=2)
+    clf = svm.SVC(C=10, kernel= 'rbf', gamma=0.5)
     clf.fit(X,t)
-    _subplot_svm_margin(clf, X, t, 5, 1)
-    plt.title("C = 0.01, gamma=2")
+    _subplot_svm_margin(clf, X, t, 4, 1)
+    plt.title("C = 10, gamma=0.5")
 
-    clf = svm.SVC(C=0.1, kernel= 'rbf', gamma=1)
+    clf = svm.SVC(C=0.5, kernel= 'rbf', gamma=0.5)
     clf.fit(X,t)
-    _subplot_svm_margin(clf, X, t, 5, 2)
-    plt.title("C = 0.1, gamma=1")
-
-    clf= svm.SVC(C=0.5, kernel= 'rbf', gamma=0.5)
-    clf.fit(X,t)
-    _subplot_svm_margin(clf, X, t, 5, 3)
+    _subplot_svm_margin(clf, X, t, 4, 2)
     plt.title("C = 0.5, gamma=0.5")
 
     clf= svm.SVC(C=10, kernel= 'rbf', gamma=0.1)
     clf.fit(X,t)
-    _subplot_svm_margin(clf, X, t, 5, 4)
+    _subplot_svm_margin(clf, X, t, 4, 3)
     plt.title("C = 10, gamma=0.1")
 
-    clf= svm.SVC(C=1000, kernel= 'rbf', gamma=0.02)
+    clf= svm.SVC(C=0.5, kernel= 'rbf', gamma=0.1)
     clf.fit(X,t)
-    _subplot_svm_margin(clf, X, t, 5, 5)
-    plt.title("C = 1000, gamma=0.02")    
+    _subplot_svm_margin(clf, X, t, 4, 4)
+    plt.title("C = 0.5, gamma=0.1")
+
+    # clf= svm.SVC(C=0.0001, kernel= 'rbf', gamma=2)
+    # clf= svm.SVC(C=10, kernel= 'rbf', gamma=2)
+    # clf.fit(X,t)
+    # _subplot_svm_margin(clf, X, t, 5, 3)
+    # plt.title("C = 10, gamma=2")
+
 
     plt.show()
 
@@ -265,7 +238,7 @@ if __name__ == '__main__':
 
     # Part 1.5
     _compare_C()  
-
+    '''
     # Part 2.1
     '''
     (X_train, t_train), (X_test, t_test) = load_cancer()
@@ -287,25 +260,15 @@ if __name__ == '__main__':
     print("polynomial")
     svc = svm.SVC(C=1000, kernel='poly')
     train_test_SVM(svc, X_train, t_train, X_test, t_test)
-
+    '''
+    '''
     # Indepentend Section
-    # Comparing visually different parameters on the cancer dataset
+    # Comparing visually different parameters on a bigger blob dataset
     # Hyper-parameters like C or Gamma control how 
     # wiggling the SVM decision boundary could be.
     # using default kernel = rbf
-    # (X_train, t_train), (X_test, t_test) = load_cancer()
-    # print(X_test.shape)
-    # print(t_test.shape)
-
-    # clf = svm.SVC(C=500, kernel= 'poly', gamma=1)
-    # clf.fit(X_test,t_test)
-    # svc = svm.SVC(C=1000, kernel='poly', gamma=5)
-    # compare(svc, X_train, t_train, X_test, t_test, "c=1000, gamma = 5")
-
-
-    # Using larger blob to compare
     compare_INDE()
-
+    '''
 
 
 
