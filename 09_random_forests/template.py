@@ -8,6 +8,25 @@
 # automatically.  We ONLY want the functions as stated in the README.md.
 # Make sure to comment out or remove all unnecessary code before submitting.
 
+# using cancer dataset, decision tree
+# 1.1 
+# complete the class given below
+
+# section 2 Implementing random forest, also using the cancer data
+# 2.1
+
+# 2.2
+# how important are the features in the learning
+
+# 2.3
+# out of bag error
+
+# 2.4
+# error also part of sklearn.metrics
+
+# section 3
+# barplot
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -37,33 +56,36 @@ class CancerClassifier:
                 test_size=1-train_ratio, random_state=109)
 
         # Fit the classifier to the training data here
-        ...
+        self.classifier.fit(self.X_train, self.t_train)
+        self.guess = self.classifier.predict(self.X_test)
 
     def confusion_matrix(self) -> np.ndarray:
         '''Returns the confusion matrix on the test data
         '''
-        ...
+        return confusion_matrix(self.t_test, self.guess)
 
     def accuracy(self) -> float:
         '''Returns the accuracy on the test data
         '''
-        ...
+        return accuracy_score(self.t_test, self.guess)
 
     def precision(self) -> float:
         '''Returns the precision on the test data
         '''
-        ...
+        return precision_score(self.t_test, self.guess)
 
     def recall(self) -> float:
         '''Returns the recall on the test data
         '''
-        ...
+        return recall_score(self.t_test, self.guess)
 
     def cross_validation_accuracy(self) -> float:
         '''Returns the average 10-fold cross validation
         accuracy on the entire dataset.
         '''
-        ...
+        # tries to figure out if our selected dataset is good, if it works well
+        # use import from sklearn.metrics
+        return cross_val_score(self.classifier, self.X, self.t, cv=10)
 
     def feature_importance(self) -> list:
         '''
@@ -71,7 +93,31 @@ class CancerClassifier:
         for the current classifier and return a list of
         indices, sorted by feature importance (high to low).
         '''
-        ...
+        self.importance = self.classifier.feature_importances_
+
+        # Make a random dataset:
+        height = self.importance
+        bars = range(0, len(self.importance))
+
+        # height = [3, 12, 5, 18, 45]
+        # bars = ('A', 'B', 'C', 'D', 'E')
+        y_pos = np.arange(len(bars))
+
+        # Create bars
+        plt.bar(y_pos, height)
+
+        # Create names on the x-axis
+        plt.xticks(y_pos, bars)
+
+        plt.xlabel("Feature index")
+        plt.ylabel("Feature importance")
+        # Show graphic
+        plt.show()
+
+        # ind = np.argsort(list) sorts indexes from lowest to higest.
+        # Then do np.flip(ind) to sort indexes from highest to lowest.
+        indx = np.argsort(self.importance)
+        return np.flip(indx)
 
 
 def _plot_oob_error():
@@ -126,3 +172,52 @@ def _plot_oob_error():
 
 def _plot_extreme_oob_error():
     ...
+
+
+if __name__ == '__main__':
+    # PART 1.1 and 1.2
+    '''
+    classifier_type = DecisionTreeClassifier()
+    cc = CancerClassifier(classifier_type)
+    print("DecisionTreeClassifier")
+    print("Confusion Matrix")
+    print(cc.confusion_matrix())
+    print(f"Accuracy: {cc.accuracy()}")
+    print(f"Precision: {cc.precision()}")
+    print(f"Recall: {cc.recall()}")
+    print(f"Cross validation acc: : {cc.cross_validation_accuracy()}")
+
+    # PART 2.1 Vanilla means using all default parametes in the classifier
+    # n_estimator : number of trees in the forest
+    classifier_type = RandomForestClassifier(n_estimators=50, max_features=30)
+    dd = CancerClassifier(classifier_type)
+    print("RandomForestClassifier")
+    print("Confusion Matrix")
+    print(dd.confusion_matrix())
+    print(f"Accuracy: {dd.accuracy()}")
+    print(f"Precision: {dd.precision()}")
+    print(f"Recall: {dd.recall()}")
+    print(f"Cross validation acc: : {dd.cross_validation_accuracy()}")
+    '''
+    '''
+    cancer = load_breast_cancer()
+    X = cancer.data
+    t = cancer.target
+    print(X.shape)
+    print(t.shape)
+    '''
+    
+    # PART 2.2
+    classifier_type = RandomForestClassifier()
+    ee = CancerClassifier(classifier_type)
+    print("feature importance")
+    print(ee.feature_importance())
+
+    # PART 2.3 Answer in pdf...
+
+    # PART 2.4
+    
+
+
+
+

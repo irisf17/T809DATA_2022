@@ -8,6 +8,14 @@
 # automatically.  We ONLY want the functions as stated in the README.md.
 # Make sure to comment out or remove all unnecessary code before submitting.
 
+# section1 using titanic dataset and pandas 
+# get_titanic from tools, fetches the datset from kaggle, combines them and cleans
+# need to have folder inside project named /data/train.csv and /data/test.csv
+# need to implement better_titanic data. clean the data
+
+# section2 using random forest, pick from sklearn.metrics
+
+# section 3
 
 import os
 import numpy as np
