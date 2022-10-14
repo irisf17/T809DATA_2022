@@ -99,16 +99,11 @@ class CancerClassifier:
         height = self.importance
         bars = range(0, len(self.importance))
 
-        # height = [3, 12, 5, 18, 45]
-        # bars = ('A', 'B', 'C', 'D', 'E')
         y_pos = np.arange(len(bars))
-
         # Create bars
         plt.bar(y_pos, height)
-
         # Create names on the x-axis
         plt.xticks(y_pos, bars)
-
         plt.xlabel("Feature index")
         plt.ylabel("Feature importance")
         # Show graphic
@@ -122,6 +117,15 @@ class CancerClassifier:
 
 def _plot_oob_error():
     RANDOM_STATE = 1337
+
+    cancer = load_breast_cancer()
+    X = cancer.data  # all feature vectors
+    t = cancer.target  # all corresponding labels
+    train_ratio = 0.7
+    X_train, X_test, t_train, t_test =\
+        train_test_split(cancer.data, cancer.target,test_size=1-train_ratio, random_state=109)
+
+
     ensemble_clfs = [
         ("RandomForestClassifier, max_features='sqrt'",
             RandomForestClassifier(
@@ -154,7 +158,7 @@ def _plot_oob_error():
     for label, clf in ensemble_clfs:
         for i in range(min_estimators, max_estimators + 1):
             clf.set_params(n_estimators=i)
-            clf.fit(...,  ...)  # Use cancer data here
+            clf.fit(X, t)  # Use cancer data here ??? Right data?
             oob_error = 1 - clf.oob_score_
             error_rate[label].append((i, oob_error))
 
@@ -216,7 +220,10 @@ if __name__ == '__main__':
     # PART 2.3 Answer in pdf...
 
     # PART 2.4
-    
+    # https://scikit-learn.org/stable/auto_examples/ensemble/plot_ensemble_oob.html
+    _plot_oob_error()
+
+
 
 
 
