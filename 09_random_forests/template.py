@@ -121,11 +121,7 @@ def _plot_oob_error():
     cancer = load_breast_cancer()
     X = cancer.data  # all feature vectors
     t = cancer.target  # all corresponding labels
-    train_ratio = 0.7
-    X_train, X_test, t_train, t_test =\
-        train_test_split(cancer.data, cancer.target,test_size=1-train_ratio, random_state=109)
-
-
+    
     ensemble_clfs = [
         ("RandomForestClassifier, max_features='sqrt'",
             RandomForestClassifier(
@@ -158,7 +154,7 @@ def _plot_oob_error():
     for label, clf in ensemble_clfs:
         for i in range(min_estimators, max_estimators + 1):
             clf.set_params(n_estimators=i)
-            clf.fit(X, t)  # Use cancer data here ??? Right data?
+            clf.fit(X, t)  # Use cancer data here
             oob_error = 1 - clf.oob_score_
             error_rate[label].append((i, oob_error))
 
@@ -167,6 +163,7 @@ def _plot_oob_error():
         xs, ys = zip(*clf_err)
         plt.plot(xs, ys, label=label)
 
+    plt.title("OOB error")
     plt.xlim(min_estimators, max_estimators)
     plt.xlabel("n_estimators")
     plt.ylabel("OOB error rate")
@@ -175,7 +172,63 @@ def _plot_oob_error():
 
 
 def _plot_extreme_oob_error():
-    ...
+    RANDOM_STATE = 1337
+
+    cancer = load_breast_cancer()
+    X = cancer.data  # all feature vectors
+    t = cancer.target  # all corresponding labels
+    
+    ensemble_clfs = [
+        ("ExtraTreesClassifier, max_features='sqrt'",
+            ExtraTreesClassifier(
+                n_estimators=100,
+                warm_start=True,
+                oob_score=True,
+                bootstrap=True,
+                max_features="sqrt",
+                random_state=RANDOM_STATE)),
+        ("ExtraTreesClassifier, max_features='log2'",
+            ExtraTreesClassifier(
+                n_estimators=100,
+                warm_start=True,
+                max_features='log2',
+                oob_score=True,
+                bootstrap=True,
+                random_state=RANDOM_STATE)),
+        ("ExtraTreesClassifier, max_features=None",
+            ExtraTreesClassifier(
+                n_estimators=100,
+                warm_start=True,
+                max_features=None,
+                oob_score=True,
+                bootstrap=True,
+                random_state=RANDOM_STATE))]
+
+    # Map a classifier name to a list of (<n_estimators>, <error rate>) pairs.
+    error_rate = OrderedDict((label, []) for label, _ in ensemble_clfs)
+
+    min_estimators = 30
+    max_estimators = 175
+
+    for label, clf in ensemble_clfs:
+        for i in range(min_estimators, max_estimators + 1):
+            clf.set_params(n_estimators=i)
+            clf.fit(X, t)  # Use cancer data here
+            oob_error = 1 - clf.oob_score_
+            error_rate[label].append((i, oob_error))
+
+    # Generate the "OOB error rate" vs. "n_estimators" plot.
+    for label, clf_err in error_rate.items():
+        xs, ys = zip(*clf_err)
+        plt.plot(xs, ys, label=label)
+
+    plt.title("Extreme OOB error")
+    plt.xlim(min_estimators, max_estimators)
+    plt.xlabel("n_estimators")
+    plt.ylabel("OOB error rate")
+    plt.legend(loc="upper right")
+    plt.show()
+
 
 
 if __name__ == '__main__':
@@ -210,7 +263,7 @@ if __name__ == '__main__':
     print(X.shape)
     print(t.shape)
     '''
-    
+    '''
     # PART 2.2
     classifier_type = RandomForestClassifier()
     ee = CancerClassifier(classifier_type)
@@ -222,8 +275,35 @@ if __name__ == '__main__':
     # PART 2.4
     # https://scikit-learn.org/stable/auto_examples/ensemble/plot_ensemble_oob.html
     _plot_oob_error()
+    '''
 
+    # PART 3.1 run cancer classifier using ExtraTreesClassifier
+    # Able to see all the features is readmne 08 SVM or cancer.feature_names
+    '''
+    classifier_type = ExtraTreesClassifier()
+    ff = CancerClassifier(classifier_type)
+    print("ExtraTreesClassifier")
+    print("Confusion Matrix")
+    print(ff.confusion_matrix())
+    print(f"Accuracy: {ff.accuracy()}")
+    print(f"Precision: {ff.precision()}")
+    print(f"Recall: {ff.recall()}")
+    print(f"Cross validation acc: : {ff.cross_validation_accuracy()}") 
+    print("feature importance")
+    print(ff.feature_importance())
 
+    cancer = load_breast_cancer()
+    imp_features = ff.feature_importance()
+    f_names = cancer.feature_names
+
+    print("Most important feature")
+    print(f_names[imp_features[0]])
+    print("Least important feature")
+    print(f_names[imp_features[-1]])
+    '''
+    # PART 3.2
+    _plot_extreme_oob_error()
+    
 
 
 
