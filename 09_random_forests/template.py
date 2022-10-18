@@ -1,6 +1,6 @@
-# Author: 
-# Date:
-# Project: 
+# Author: Íris Friðriksdóttir
+# Date: 18.okt 2022
+# Project: 09_random_forests
 # Acknowledgements: 
 #
 
@@ -104,6 +104,7 @@ class CancerClassifier:
         plt.bar(y_pos, height)
         # Create names on the x-axis
         plt.xticks(y_pos, bars)
+        # plt.title("Feature Importance")
         plt.xlabel("Feature index")
         plt.ylabel("Feature importance")
         # Show graphic
@@ -243,10 +244,13 @@ if __name__ == '__main__':
     print(f"Precision: {cc.precision()}")
     print(f"Recall: {cc.recall()}")
     print(f"Cross validation acc: : {cc.cross_validation_accuracy()}")
+    '''
 
     # PART 2.1 Vanilla means using all default parametes in the classifier
-    # n_estimator : number of trees in the forest
-    classifier_type = RandomForestClassifier(n_estimators=50, max_features=30)
+    # n_estimator : number of trees in the forest, default = 100
+    # n_estimators=50, max_features=30
+    '''
+    classifier_type = RandomForestClassifier(max_features=30)
     dd = CancerClassifier(classifier_type)
     print("RandomForestClassifier")
     print("Confusion Matrix")
@@ -256,24 +260,16 @@ if __name__ == '__main__':
     print(f"Recall: {dd.recall()}")
     print(f"Cross validation acc: : {dd.cross_validation_accuracy()}")
     '''
-    '''
-    cancer = load_breast_cancer()
-    X = cancer.data
-    t = cancer.target
-    print(X.shape)
-    print(t.shape)
-    '''
-    '''
     # PART 2.2
+    '''
     classifier_type = RandomForestClassifier()
     ee = CancerClassifier(classifier_type)
     print("feature importance")
     print(ee.feature_importance())
-
-    # PART 2.3 Answer in pdf...
-
+    '''
     # PART 2.4
     # https://scikit-learn.org/stable/auto_examples/ensemble/plot_ensemble_oob.html
+    '''
     _plot_oob_error()
     '''
 
@@ -301,8 +297,10 @@ if __name__ == '__main__':
     print("Least important feature")
     print(f_names[imp_features[-1]])
     '''
+    '''
     # PART 3.2
     _plot_extreme_oob_error()
+    '''
     
 
 
