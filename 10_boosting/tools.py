@@ -11,9 +11,9 @@ def get_titanic():
     # Load in the raw data
     # check if data directory exists for Mimir submissions
     # DO NOT REMOVE
-    if os.path.exists('./data/train.csv'):
-        train = pd.read_csv('./data/train.csv')
-        test = pd.read_csv('./data/test.csv')
+    if os.path.exists('c:/Users/irisf/Documents/HR-master/MachineLearning/T809DATA_2022/10_boosting/data/train.csv'):
+        train = pd.read_csv('c:/Users/irisf/Documents/HR-master/MachineLearning/T809DATA_2022/10_boosting/data/train.csv')
+        test = pd.read_csv('c:/Users/irisf/Documents/HR-master/MachineLearning/T809DATA_2022/10_boosting/data/test.csv')
     else:
         train = pd.read_csv('train.csv')
         test = pd.read_csv('test.csv')
@@ -32,6 +32,7 @@ def get_titanic():
     X_full.loc[:, 'Cabin_mapped'] =\
         X_full.loc[:, 'Cabin_mapped'].map(cabin_dict)
 
+    print(X_full['Age'])
     # We drop multiple columns that contain a lot of NaN values
     # in this assignment
     # Maybe we should
