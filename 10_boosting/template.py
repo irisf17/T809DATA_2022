@@ -69,6 +69,7 @@ def get_better_titanic():
         inplace=True, axis=1)
     # Instead of dropping the Age column we replace NaN values
     # with a randomized value that is between the max value and min value.
+    random.seed(1234)
     age_min = X_full.Age.min()
     age_max = X_full.Age.max()
     age_mean = X_full.Age.mean()
@@ -77,6 +78,9 @@ def get_better_titanic():
     sigma1 = int(age_mean-age_std)
     sigma_2 = int(age_mean+age_std)
     age_guess = random.randint(sigma1, sigma_2)
+    # age_guess = random.randint(int(age_min), int(age_max))
+    # age_guess = int(age_mean)
+    
     # print(age_min)
     # print(age_max)
     # print(age_mean)
@@ -89,7 +93,7 @@ def get_better_titanic():
     # with the 3rd class passenger fare mean.
     fare_mean = X_full[X_full.Pclass == 3].Fare.mean()
     X_full['Fare'].fillna(fare_mean, inplace=True)
-    print(X_full['Age'])
+    # print(X_full['Age'])
     # Instead of dropping the Embarked column we replace NaN values
     # with `S` denoting Southampton, the most common embarking
     # location
@@ -148,11 +152,14 @@ def param_search(X, y):
     Perform randomized parameter search on the
     gradient boosting classifier on the dataset (X, y)
     '''
+    n_est = np.linspace(1,100,100)
+    m_depth = np.linspace(1,50,50)
+    l_rate = np.linspace(0.1, 1, 20)
     # Create the parameter grid
     gb_param_grid = {
-        'n_estimators': [...],
-        'max_depth': [...],
-        'learning_rate': [...]}
+        'n_estimators': n_est.astype(int),
+        'max_depth': m_depth.astype(int),
+        'learning_rate': l_rate.astype(float)}
     # Instantiate the regressor
     gb = GradientBoostingClassifier()
     # Perform random search
@@ -161,7 +168,7 @@ def param_search(X, y):
         estimator=gb,
         scoring="accuracy",
         verbose=0,
-        n_iter=50,
+        n_iter=200,
         cv=4)
     # Fit randomized_mse to the data
     gb_random.fit(X, y)
@@ -169,13 +176,29 @@ def param_search(X, y):
     return gb_random.best_params_
 
 
-def gb_optimized_train_test(X_train, t_train, X_test, t_test):
+def gb_optimized_train_test(X_train, t_train, X_test, t_test, n_est, m_depth, l_rate):
     '''
     Train a gradient boosting classifier on (X_train, t_train)
     and evaluate it on (X_test, t_test) with
     your own optimized parameters
     '''
-    ...
+    # best_par = param_search(X_train, t_train)
+    # n_est = best_par['n_estimators']
+    # m_depth = best_par['max_depth']
+    # l_rate = best_par['learning_rate']
+    # print(n_est)
+    # print(m_depth)
+    # print(l_rate)
+
+
+    clf = GradientBoostingClassifier(n_estimators=n_est, max_depth=m_depth, learning_rate=l_rate)
+    clf.fit(X_train, t_train)
+    guess = clf.predict(X_test)
+
+    acc = accuracy_score(t_test, guess)
+    prec = precision_score(t_test, guess)
+    rec = recall_score(t_test, guess)
+    return acc, prec, rec
 
 
 def _create_submission():
@@ -193,11 +216,32 @@ if __name__ == '__main__':
     # print(tr_X.shape)
     # print(tr_y.shape)
     # print(get_titanic())
-    # print(get_better_titanic())
 
     # PART 1
     (tr_X, tr_y), (tst_X, tst_y), submission_X = get_better_titanic()
 
-    # PART 2
+    # PART 2.1 random forest classification
     print(rfc_train_test(tr_X, tr_y, tst_X, tst_y))
+    # PART 2.3 gradient boost classifier
     print(gb_train_test(tr_X, tr_y, tst_X, tst_y))
+
+    # PART 2.5 finding the best parameters
+    # best_par = param_search(tr_X, tr_y)
+    # # n_est = best_par['n_estimators']
+    # # m_depth = best_par['max_depth']
+    # # l_rate = best_par['learning_rate']
+    # print(best_par)
+
+    best_par = param_search(tr_X, tr_y)
+    print(best_par)
+    n_est = best_par['n_estimators']
+    m_depth = best_par['max_depth']
+    l_rate = best_par['learning_rate']
+
+    # PART 2.6
+    # NOT getting better values all the time, because it is a randomized search for the parameters???
+    print(gb_optimized_train_test(tr_X, tr_y, tst_X, tst_y, n_est, m_depth, l_rate))
+
+
+    # INDE
+    # Should I also turn in to kaggle my independent code if I get better acc, rec, pre..?
