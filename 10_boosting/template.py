@@ -298,7 +298,7 @@ def ind_cleaning_data():
     submission_X = X_dummies[len(train):]
     y = train.Survived
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=.3, random_state=5, stratify=y, random_state=42)
+        X, y, test_size=.3, random_state=5, stratify=y)
 
     return (X_train, y_train), (X_test, y_test), submission_X
     
@@ -346,7 +346,7 @@ def ind_rfc_train_test_best_param(X_train, t_train, X_test, t_test):
     n_est = best_par['n_estimators']
 
     # n_estimators=default value = 100, max_features = number of columns
-    clf = RandomForestClassifier(criterion=n_crit, max_depth=m_depth, n_estimator=n_est,  random_state=42)
+    clf = RandomForestClassifier(criterion=n_crit, max_depth=m_depth, n_estimators=n_est)
     clf.fit(X_train, t_train)
     guess = clf.predict(X_test)
 
@@ -411,3 +411,5 @@ if __name__ == '__main__':
 
     ind_rfc_train_test(newX_train, y_train, newX_test, y_test)
     print(inde_param_search(newX_train, y_train))
+
+    ind_rfc_train_test_best_param(newX_train, y_train, newX_test, y_test)
