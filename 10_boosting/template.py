@@ -122,7 +122,7 @@ def rfc_train_test(X_train, t_train, X_test, t_test):
     and evaluate it on (X_test, t_test)
     '''
     # n_estimators=default value = 100, max_features = number of columns
-    clf = RandomForestClassifier(n_estimators=100, max_features=16)
+    clf = RandomForestClassifier(random_state=42, n_estimators=100, max_features=16)
     clf.fit(X_train, t_train)
     guess = clf.predict(X_test)
 
@@ -141,7 +141,7 @@ def gb_train_test(X_train, t_train, X_test, t_test):
     Train a Gradient boosting classifier on (X_train, t_train)
     and evaluate it on (X_test, t_test)
     '''
-    clf = GradientBoostingClassifier()
+    clf = GradientBoostingClassifier(random_state=42)
     clf.fit(X_train, t_train)
     guess = clf.predict(X_test)
 
@@ -169,7 +169,7 @@ def param_search(X, y):
         'max_depth': m_depth.astype(int),
         'learning_rate': l_rate.astype(float)}
     # Instantiate the regressor
-    gb = GradientBoostingClassifier()
+    gb = GradientBoostingClassifier(random_state=42)
     # Perform random search
     gb_random = RandomizedSearchCV(
         param_distributions=gb_param_grid,
@@ -184,13 +184,17 @@ def param_search(X, y):
     return gb_random.best_params_
 
 
-def gb_optimized_train_test(X_train, t_train, X_test, t_test, n_est, m_depth, l_rate):
+def gb_optimized_train_test(X_train, t_train, X_test, t_test):
     '''
     Train a gradient boosting classifier on (X_train, t_train)
     and evaluate it on (X_test, t_test) with
     your own optimized parameters
     '''
-    clf = GradientBoostingClassifier(n_estimators=n_est, max_depth=m_depth, learning_rate=l_rate)
+    best_par = param_search(tr_X, tr_y)
+    n_est = best_par['n_estimators']
+    m_depth = best_par['max_depth']
+    l_rate = best_par['learning_rate']
+    clf = GradientBoostingClassifier(random_state=42, n_estimators=n_est, max_depth=m_depth, learning_rate=l_rate)
     clf.fit(X_train, t_train)
     guess = clf.predict(X_test)
 
@@ -322,9 +326,9 @@ def inde_param_search(X, y):
     Perform randomized parameter search on the
     gradient boosting classifier on the dataset (X, y)
     '''
-    n_est = np.linspace(1,100,10)
-    m_depth = np.linspace(1,50,5)
-    l_rate = np.linspace(0.1, 1, 5)
+    n_est = np.linspace(1,100,100)
+    m_depth = np.linspace(1,50,50)
+    l_rate = np.linspace(0.1, 1, 10)
     # Create the parameter grid
     param_grid = {
         'n_estimators': n_est.astype(int),
@@ -346,32 +350,53 @@ def ind_rfc_train_test_best_param(X_train, t_train, X_test, t_test):
     n_est = best_par['n_estimators']
 
     # n_estimators=default value = 100, max_features = number of columns
-    clf = RandomForestClassifier(criterion=n_crit, max_depth=m_depth, n_estimators=n_est)
+    clf = RandomForestClassifier(random_state=42, criterion=n_crit, max_depth=m_depth, n_estimators=n_est)
     clf.fit(X_train, t_train)
     guess = clf.predict(X_test)
 
     acc = accuracy_score(t_test, guess)
     prec = precision_score(t_test, guess)
     rec = recall_score(t_test, guess)
-    print("Random Forest Classifier")
+    print("Random Forest Classifier better parameters")
     print(f"Accuracy: {acc}")
     print(f"Precision: {prec}")
     print(f"Recall: {rec}")
     return acc, prec, rec
 
+def ind_create_submission():
+    '''Create your kaggle submission for independent part
+    '''
+    (X_train, y_train), (X_test, y_test), submission_X = ind_cleaning_data()
+    newX_train = X_train.drop(['Cabin_mapped_1', 'Cabin_mapped_2', 'Cabin_mapped_3', 'Cabin_mapped_4', 'Cabin_mapped_5', 'Cabin_mapped_6','Cabin_mapped_7','Cabin_mapped_8', 'Embarked_Q', 'Embarked_S'], axis=1)
+    newX_test = X_test.drop(['Cabin_mapped_1', 'Cabin_mapped_2', 'Cabin_mapped_3', 'Cabin_mapped_4', 'Cabin_mapped_5', 'Cabin_mapped_6','Cabin_mapped_7','Cabin_mapped_8', 'Embarked_Q', 'Embarked_S'], axis=1)
+    newSubmission_X = X_test.drop(['Cabin_mapped_1', 'Cabin_mapped_2', 'Cabin_mapped_3', 'Cabin_mapped_4', 'Cabin_mapped_5', 'Cabin_mapped_6','Cabin_mapped_7','Cabin_mapped_8', 'Embarked_Q', 'Embarked_S'], axis=1)
+    print(submission_X.shape)
+    print(newSubmission_X.shape)
+    # best parameters
+    best_par = inde_param_search(newX_train, y_train)
+    print("Best parameters")
+    print(best_par)
+    n_crit = best_par['criterion']
+    m_depth = best_par['max_depth']
+    n_est = best_par['n_estimators']
+
+    # n_estimators=default value = 100, max_features = number of columns
+    rfc = RandomForestClassifier(criterion=n_crit, max_depth=m_depth, n_estimators=n_est)
+    rfc.fit(newX_train, y_train)
+    predict = rfc.predict(newSubmission_X)
+    build_kaggle_submission(predict)
+
 
 if __name__ == '__main__':
+    '''
     # (tr_X, tr_y), (tst_X, tst_y), submission_X = get_titanic()
     # print(tr_X['Pclass'])
     # print(tr_X.shape)
     # print(tr_y.shape)
     # print(get_titanic())
-    '''
+    
     # PART 1    
     (tr_X, tr_y), (tst_X, tst_y), submission_X = get_better_titanic()
-    print(tst_X.shape)
-    print(tr_X.shape)
-    print(submission_X.shape)
 
     # PART 2.1 random forest classification
     rfc_train_test(tr_X, tr_y, tst_X, tst_y)
@@ -386,20 +411,17 @@ if __name__ == '__main__':
     # # l_rate = best_par['learning_rate']
     # print(best_par)
 
-    best_par = param_search(tr_X, tr_y)
-    print(best_par)
-    n_est = best_par['n_estimators']
-    m_depth = best_par['max_depth']
-    l_rate = best_par['learning_rate']
 
     # PART 2.6
     # NOT getting better values all the time, because it is a randomized search for the parameters???
-    gb_optimized_train_test(tr_X, tr_y, tst_X, tst_y, n_est, m_depth, l_rate)
-
+    gb_optimized_train_test(tr_X, tr_y, tst_X, tst_y)
+    '''
+    
     '''
     # PART 3
     # _create_submission()
 
+    
     # INDE
     # Should I also turn in to kaggle my independent code if I get better acc, rec, pre..?
     # ind_feat_importance()
@@ -408,8 +430,15 @@ if __name__ == '__main__':
     newX_train = X_train.drop(['Cabin_mapped_1', 'Cabin_mapped_2', 'Cabin_mapped_3', 'Cabin_mapped_4', 'Cabin_mapped_5', 'Cabin_mapped_6','Cabin_mapped_7','Cabin_mapped_8', 'Embarked_Q', 'Embarked_S'], axis=1)
     newX_test = X_test.drop(['Cabin_mapped_1', 'Cabin_mapped_2', 'Cabin_mapped_3', 'Cabin_mapped_4', 'Cabin_mapped_5', 'Cabin_mapped_6','Cabin_mapped_7','Cabin_mapped_8', 'Embarked_Q', 'Embarked_S'], axis=1)
     # print(new_train[1:])
+    print("Random Forest Classifier using all the data")
+    rfc_train_test(X_train, y_train, X_test, y_test)
 
+    print("Edited data, only important features")
     ind_rfc_train_test(newX_train, y_train, newX_test, y_test)
-    print(inde_param_search(newX_train, y_train))
+    # Best parameters
+    # print(inde_param_search(newX_train, y_train))
 
     ind_rfc_train_test_best_param(newX_train, y_train, newX_test, y_test)
+    '''
+    # ind_create_submission()
+    
