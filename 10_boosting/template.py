@@ -68,7 +68,7 @@ def get_better_titanic():
         ['PassengerId', 'Cabin', 'Name', 'Ticket'],
         inplace=True, axis=1)
     # Instead of dropping the Age column we replace NaN values
-    # with a randomized value that is between the max value and min value.
+    # with a randomized value that is between the sigma1 value and sigma2 value.
     random.seed(1234)
     age_min = X_full.Age.min()
     age_max = X_full.Age.max()
@@ -122,13 +122,17 @@ def rfc_train_test(X_train, t_train, X_test, t_test):
     and evaluate it on (X_test, t_test)
     '''
     # n_estimators=default value = 100, max_features = number of columns
-    clf = RandomForestClassifier(n_estimators=100, max_features=15)
+    clf = RandomForestClassifier(n_estimators=100, max_features=16)
     clf.fit(X_train, t_train)
     guess = clf.predict(X_test)
 
     acc = accuracy_score(t_test, guess)
     prec = precision_score(t_test, guess)
     rec = recall_score(t_test, guess)
+    print("Random Forest Classifier")
+    print(f"Accuracy: {acc}")
+    print(f"Precision: {prec}")
+    print(f"Recall: {rec}")
     return acc, prec, rec
 
 
@@ -144,6 +148,10 @@ def gb_train_test(X_train, t_train, X_test, t_test):
     acc = accuracy_score(t_test, guess)
     prec = precision_score(t_test, guess)
     rec = recall_score(t_test, guess)
+    print("Gradient Boosting Classifier")
+    print(f"Accuracy: {acc}")
+    print(f"Precision: {prec}")
+    print(f"Recall: {rec}")
     return acc, prec, rec
 
 
@@ -182,15 +190,6 @@ def gb_optimized_train_test(X_train, t_train, X_test, t_test, n_est, m_depth, l_
     and evaluate it on (X_test, t_test) with
     your own optimized parameters
     '''
-    # best_par = param_search(X_train, t_train)
-    # n_est = best_par['n_estimators']
-    # m_depth = best_par['max_depth']
-    # l_rate = best_par['learning_rate']
-    # print(n_est)
-    # print(m_depth)
-    # print(l_rate)
-
-
     clf = GradientBoostingClassifier(n_estimators=n_est, max_depth=m_depth, learning_rate=l_rate)
     clf.fit(X_train, t_train)
     guess = clf.predict(X_test)
@@ -198,14 +197,19 @@ def gb_optimized_train_test(X_train, t_train, X_test, t_test, n_est, m_depth, l_
     acc = accuracy_score(t_test, guess)
     prec = precision_score(t_test, guess)
     rec = recall_score(t_test, guess)
-    return acc, prec, rec
+    print("Gradient Boosting Classifier")
+    print(f"Accuracy: {acc}")
+    print(f"Precision: {prec}")
+    print(f"Recall: {rec}")
 
 
 def _create_submission():
     '''Create your kaggle submission
     '''
-    ...
-    prediction = ...
+    (X_train, y_train), (X_test, y_test), submission_X = get_better_titanic()
+    gbc = GradientBoostingClassifier()
+    gbc.fit(X_train, y_train)
+    prediction = gbc.predict(submission_X)
     build_kaggle_submission(prediction)
 
 
@@ -217,13 +221,16 @@ if __name__ == '__main__':
     # print(tr_y.shape)
     # print(get_titanic())
 
-    # PART 1
+    # PART 1    
     (tr_X, tr_y), (tst_X, tst_y), submission_X = get_better_titanic()
+    # print(tst_X.shape)
+    # print(tr_X.shape)
+    # print(submission_X.shape)
 
     # PART 2.1 random forest classification
-    print(rfc_train_test(tr_X, tr_y, tst_X, tst_y))
+    rfc_train_test(tr_X, tr_y, tst_X, tst_y)
     # PART 2.3 gradient boost classifier
-    print(gb_train_test(tr_X, tr_y, tst_X, tst_y))
+    gb_train_test(tr_X, tr_y, tst_X, tst_y)
 
     # PART 2.5 finding the best parameters
     # best_par = param_search(tr_X, tr_y)
@@ -240,8 +247,11 @@ if __name__ == '__main__':
 
     # PART 2.6
     # NOT getting better values all the time, because it is a randomized search for the parameters???
-    print(gb_optimized_train_test(tr_X, tr_y, tst_X, tst_y, n_est, m_depth, l_rate))
+    gb_optimized_train_test(tr_X, tr_y, tst_X, tst_y, n_est, m_depth, l_rate)
 
+
+    # PART 3
+    # _create_submission()
 
     # INDE
     # Should I also turn in to kaggle my independent code if I get better acc, rec, pre..?
