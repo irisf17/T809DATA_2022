@@ -256,11 +256,13 @@ def ind_cleaning_data():
     # We can divide the cabin category by extracting the first
     # letter and use that to create a new category. So before we
     # drop the `Cabin` column we extract these values
+    
     X_full['Cabin_mapped'] = X_full['Cabin'].astype(str).str[0]
     # Then we transform the letters into numbers
     cabin_dict = {k: i for i, k in enumerate(X_full.Cabin_mapped.unique())}
     X_full.loc[:, 'Cabin_mapped'] =\
         X_full.loc[:, 'Cabin_mapped'].map(cabin_dict)
+    
 
     # We drop multiple columns that contain a lot of NaN values and are not important features
     X_full.drop(
@@ -326,17 +328,17 @@ def inde_param_search(X, y):
     Perform randomized parameter search on the
     gradient boosting classifier on the dataset (X, y)
     '''
-    n_est = np.linspace(1,100,100)
+    n_est = np.linspace(1,10,100)
     m_depth = np.linspace(1,50,50)
-    l_rate = np.linspace(0.1, 1, 10)
+    l_rate = np.linspace(0.1, 1, 20)
     # Create the parameter grid
     param_grid = {
         'n_estimators': n_est.astype(int),
         'max_depth': m_depth.astype(int),
         'criterion' : ['gini', 'entropy']}
     # Instantiate the regressor
-    rfc = RandomForestClassifier(random_state=42)
-    grid = GridSearchCV(estimator=rfc, param_grid=param_grid, cv=2)
+    rfc = RandomForestClassifier()
+    grid = GridSearchCV(estimator=rfc, param_grid=param_grid, cv=5)
     # Fit randomized_mse to the data
     grid.fit(X, y)
     # Print the best parameters
@@ -344,7 +346,7 @@ def inde_param_search(X, y):
 
 def ind_rfc_train_test_best_param(X_train, t_train, X_test, t_test):
     # best para
-    best_par = inde_param_search(X_train, y_train)
+    best_par = inde_param_search(X_train, t_train)
     n_crit = best_par['criterion']
     m_depth = best_par['max_depth']
     n_est = best_par['n_estimators']
@@ -370,8 +372,8 @@ def ind_create_submission():
     newX_train = X_train.drop(['Cabin_mapped_1', 'Cabin_mapped_2', 'Cabin_mapped_3', 'Cabin_mapped_4', 'Cabin_mapped_5', 'Cabin_mapped_6','Cabin_mapped_7','Cabin_mapped_8', 'Embarked_Q', 'Embarked_S'], axis=1)
     newX_test = X_test.drop(['Cabin_mapped_1', 'Cabin_mapped_2', 'Cabin_mapped_3', 'Cabin_mapped_4', 'Cabin_mapped_5', 'Cabin_mapped_6','Cabin_mapped_7','Cabin_mapped_8', 'Embarked_Q', 'Embarked_S'], axis=1)
     newSubmission_X = X_test.drop(['Cabin_mapped_1', 'Cabin_mapped_2', 'Cabin_mapped_3', 'Cabin_mapped_4', 'Cabin_mapped_5', 'Cabin_mapped_6','Cabin_mapped_7','Cabin_mapped_8', 'Embarked_Q', 'Embarked_S'], axis=1)
-    print(submission_X.shape)
-    print(newSubmission_X.shape)
+    # print(submission_X.shape)
+    # print(newSubmission_X.shape)
     # best parameters
     best_par = inde_param_search(newX_train, y_train)
     print("Best parameters")
@@ -382,8 +384,8 @@ def ind_create_submission():
 
     # n_estimators=default value = 100, max_features = number of columns
     rfc = RandomForestClassifier(criterion=n_crit, max_depth=m_depth, n_estimators=n_est)
-    rfc.fit(newX_train, y_train)
-    predict = rfc.predict(newSubmission_X)
+    rfc.fit(X_train, y_train)
+    predict = rfc.predict(submission_X)
     build_kaggle_submission(predict)
 
 
@@ -417,7 +419,7 @@ if __name__ == '__main__':
     gb_optimized_train_test(tr_X, tr_y, tst_X, tst_y)
     '''
     
-    '''
+    
     # PART 3
     # _create_submission()
 
@@ -425,8 +427,8 @@ if __name__ == '__main__':
     # INDE
     # Should I also turn in to kaggle my independent code if I get better acc, rec, pre..?
     # ind_feat_importance()
-    (X_train, y_train), (X_test, y_test), submission_X = ind_cleaning_data()
-
+    # (X_train, y_train), (X_test, y_test), submission_X = ind_cleaning_data()
+    '''
     newX_train = X_train.drop(['Cabin_mapped_1', 'Cabin_mapped_2', 'Cabin_mapped_3', 'Cabin_mapped_4', 'Cabin_mapped_5', 'Cabin_mapped_6','Cabin_mapped_7','Cabin_mapped_8', 'Embarked_Q', 'Embarked_S'], axis=1)
     newX_test = X_test.drop(['Cabin_mapped_1', 'Cabin_mapped_2', 'Cabin_mapped_3', 'Cabin_mapped_4', 'Cabin_mapped_5', 'Cabin_mapped_6','Cabin_mapped_7','Cabin_mapped_8', 'Embarked_Q', 'Embarked_S'], axis=1)
     # print(new_train[1:])
