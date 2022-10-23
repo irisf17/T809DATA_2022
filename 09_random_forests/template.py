@@ -230,6 +230,8 @@ def _plot_extreme_oob_error():
     plt.legend(loc="upper right")
     plt.show()
 
+# ------------ INDE -----------
+
 
 
 if __name__ == '__main__':
@@ -250,7 +252,7 @@ if __name__ == '__main__':
     # n_estimator : number of trees in the forest, default = 100
     # n_estimators=50, max_features=30
     '''
-    classifier_type = RandomForestClassifier(max_features=30)
+    classifier_type = RandomForestClassifier(random_state=42, n_estimators=18, max_features=10)
     dd = CancerClassifier(classifier_type)
     print("RandomForestClassifier")
     print("Confusion Matrix")
@@ -259,7 +261,30 @@ if __name__ == '__main__':
     print(f"Precision: {dd.precision()}")
     print(f"Recall: {dd.recall()}")
     print(f"Cross validation acc: : {dd.cross_validation_accuracy()}")
+    
+    # max_f = np.linspace(1,50, 50)
+    n_est = np.linspace(1,100,100)
+    acc_maxd = []
+    pre_maxd = []
+    rec_maxd = []
+    for i in range(len(n_est)):
+        classifier_type = RandomForestClassifier(random_state=42, n_estimators=n_est.astype(int)[i])
+        rfc = CancerClassifier(classifier_type)
+        acc_maxd.append(rfc.accuracy())
+        pre_maxd.append(rfc.precision())
+        rec_maxd.append(rfc.recall())
+
+    plt.plot(range(0,len(acc_maxd)), acc_maxd)
+    plt.plot(range(0,len(acc_maxd)), pre_maxd)
+    plt.plot(range(0,len(acc_maxd)), rec_maxd)
+    plt.legend(["Accuracy", "Precision", "Recall"])
+    plt.title("Random Forest Classifier")
+    plt.xlabel("number of n_estimators")
+    plt.ylabel("Percentage %")
+    plt.show()
     '''
+    
+
     # PART 2.2
     '''
     classifier_type = RandomForestClassifier()
@@ -302,7 +327,51 @@ if __name__ == '__main__':
     _plot_extreme_oob_error()
     '''
     
+    # INDEPENDENT PART
+    # comparing different parameters for RandomForestClassifier and ExtraTreesClassifier
+    # n_estimator : number of trees in the forest, default = 100
+    # n_estimators=50, max_features=30
+    # max_depth, It governs the maximum height upto which the trees inside the forest can 
+    # grow. It is one of the most important hyperparameters when it comes to increasing the accuracy of the model, 
+    '''
+    n_est = np.linspace(1,100, 100)
+    acc_n_est = []
+    pre_n_est = []
+    rec_n_est = []
+    for i in range(len(n_est)):
+        classifier_type = ExtraTreesClassifier(n_estimators=n_est.astype(int)[i])
+        rfc = CancerClassifier(classifier_type)
+        acc_n_est.append(rfc.accuracy())
+        pre_n_est.append(rfc.precision())
+        rec_n_est.append(rfc.recall())
 
+    plt.plot(range(0,len(acc_n_est)), acc_n_est)
+    plt.plot(range(0,len(acc_n_est)), pre_n_est)
+    plt.plot(range(0,len(acc_n_est)), rec_n_est)
+    plt.legend(["Accuracy", "Precision", "Recall"])
+    plt.title("Extra Trees Classifier")
+    plt.xlabel("number of n_estimators")
+    plt.ylabel("Percentage %")
+    plt.show()
+    
+    max_depth = np.linspace(1,50, 50)
+    acc_maxd = []
+    pre_maxd = []
+    rec_maxd = []
+    for i in range(len(max_depth)):
+        classifier_type = RandomForestClassifier(max_depth=max_depth.astype(int)[i])
+        rfc = CancerClassifier(classifier_type)
+        acc_maxd.append(rfc.accuracy())
+        pre_maxd.append(rfc.precision())
+        rec_maxd.append(rfc.recall())
 
-
+    plt.plot(range(0,len(acc_maxd)), acc_maxd)
+    plt.plot(range(0,len(acc_maxd)), pre_maxd)
+    plt.plot(range(0,len(acc_maxd)), rec_maxd)
+    plt.legend(["Accuracy", "Precision", "Recall"])
+    plt.title("Random Forest Classifier")
+    plt.xlabel("number of max_depth")
+    plt.ylabel("Percentage %")
+    plt.show()
+    '''
 
