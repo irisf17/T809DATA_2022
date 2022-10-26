@@ -8,7 +8,10 @@
 # automatically.  We ONLY want the functions as stated in the README.md.
 # Make sure to comment out or remove all unnecessary code before submitting.
 
-
+# looking at breast cancer dataset
+# PCA projecting the data onto lower dimensions
+# 
+# a lot of poltting and describing 
 
 import numpy as np
 import matplotlib.pyplot as plt

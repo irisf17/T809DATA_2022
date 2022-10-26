@@ -1,5 +1,5 @@
 # Author: Íris Friðriksdóttir
-# Date: 18.okt 2022
+# Date: 23.okt 2022
 # Project: 09_random_forests
 # Acknowledgements: 
 #
